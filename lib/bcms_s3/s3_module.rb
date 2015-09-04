@@ -4,6 +4,8 @@ module Cms
       attr_accessor :heroku_caching
       attr_accessor :www_domain_prefix
       attr_accessor :options
+
+      options = {}
     end
 
     module ContentController

@@ -5,7 +5,7 @@ module Cms
       attr_accessor :www_domain_prefix
       attr_accessor :options
 
-      options = {}
+      options = {} if options.nil?
     end
 
     module ContentController

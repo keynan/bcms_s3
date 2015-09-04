@@ -27,26 +27,34 @@ Adding this gem to your project will automatically configure the CMS to use AWS 
 
     config.cms.attachments.storage = :filesystem	# This gems sets this value to :s3 when required.
 
-Create a config/s3.yml file that contains your credentials and bucket. This should be in the following format:
-
-    access_key_id: your AWS access key
-    secret_access_key: your AWS secret access key
-    bucket: your unique bucket name
-
 ### Configuring S3
 
-Before you can upload files, you will need to create an S3 bucket (one or more) and configure that. You can configure in either:
-	
-	# config/s3.yml 
-	bucket: your_project_bucket_name
-
-Which will use the same bucket in development, testing and production. Or in an environment file (if you want buckets for each environment)
+Before you can upload files, you will need to create an S3 bucket (one or more) and configure that.
+In an environment file (if you want buckets for each environment)
 
 	# config/environments/production.rb
 	config.cms.attachments.s3_bucket = "your_project_bucket_production"
 	
 	# config/environments/development.rb
 	config.cms.attachments.s3_bucket = "your_project_bucket_development"
+
+### S3 Bucket Policy Example (example-bucket > properties > permissions > add policy)
+
+{
+        "Id": "Policy144777732",  
+        "Version": "2012-10-17",
+        "Statement": [
+        {
+                "Sid": "Stmt1441324553848",
+                "Action": [
+                          "s3:GetObject"
+                          ],
+                "Effect": "Allow",
+                "Resource": "arn:aws:s3:::example-bucket/*",
+                "Principal": "*"
+        }
+        ]
+}
 
 ## Remaining todos
 
@@ -59,23 +67,15 @@ Which will use the same bucket in development, testing and production. Or in an 
 
 If using this module in conjunction with deployment on heroku you should probably turning heroku caching on by setting Cms::S3.heroku_caching in config/initializers/browsercms.rb to true.
 
-In order to avoid putting your secret AWS key in the s3.yml file, you can take advantage of [heroku's config vars](http://docs.heroku.com/config-vars). Use ERB to read the values from the environment.  This way you can safely commit your s3.yml file to the repository without revealing your amazon credentials.
+In order to avoid putting your secret AWS key in the s3.yml file, you can take advantage of [heroku's config vars](http://docs.heroku.com/config-vars). For developing on your local machine, export the s3 variables to your environment.
 
-    access_key_id: <%= ENV['s3_access_key_id'] %>
-    secret_access_key: <%= ENV['s3_secret_access_key'] %>
-    bucket: <%= ENV['s3_bucket'] %>
-
-For developing on your local machine, export the s3 variables to your environment.
-
-    export s3_access_key_id='your AWS access key'
-    export s3_secret_access_key='your AWS secret access key'
-    export s3_bucket='your unique bucket name'
+    export AWS_ACCESS_KEY_ID='your AWS access key'
+    export AWS_SECRET_ACCESS_KEY='your AWS secret access key'
 
 Set the config vars on heroku to get it working there as well.
 
-    heroku config:add s3_access_key_id='your AWS access key'
-    heroku config:add s3_secret_access_key='your AWS secret access key'
-    heroku config:add s3_bucket='your unique bucket name'
+    heroku config:set AWS_ACCESS_KEY_ID='your AWS access key'
+    heroku config:set AWS_SECRET_ACCESS_KEY='your AWS secret access key'
 
 ## www prefix for non cms urls
 If your non cms domain is www.myapp.com rather than app.com this can be enabled by setting Cms::S3.www_domain_prefix in config/initializers/browsercms.rb to true.

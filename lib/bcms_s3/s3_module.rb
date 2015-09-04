@@ -5,7 +5,7 @@ module Cms
       attr_accessor :www_domain_prefix
       attr_accessor :options
     end
-    
+
     module ContentController
       def self.included(controller_class)
         controller_class.alias_method_chain :render_page_with_caching, :s3
@@ -14,9 +14,9 @@ module Cms
         render_page
         response.headers['Cache-Control'] = 'public, max-age=300' if Cms::S3.heroku_caching
       end
-      
+
     end
-    
+
     module ApplicationController
       def self.included(controller_class)
         controller_class.alias_method_chain :url_without_cms_domain_prefix, :www
@@ -31,5 +31,3 @@ module Cms
     end
   end
 end
-
-

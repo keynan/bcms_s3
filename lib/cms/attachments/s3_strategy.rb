@@ -11,14 +11,16 @@ module Cms
       #     1. No security, all files are assumed to be public
       #     2. CNAMEs are not supported.
       def self.send_attachment(attachment, controller)
-        #controller.redirect_to attachment.url
+        url = attachment.url
+        url = url.sub "s3.amazonaws.com" Cms::S3.options[:s3_cname] if ! Cms::S3.options[:s3_cname].nil?
+        controller.redirect_to url
         logger.warn(attachment.inspect)
         # Possible s3_cname implementation
-        if Cms::S3.options[:s3_cname]
-          redirect_to("http://#{Cms::S3.options[:s3_cname]}/#{@attachment.file_location}")
-        else
-          redirect_to("http://#{Cms::S3.options[:bucket]}.s3.amazonaws.com/#{@attachment.file_location}")
-        end
+        #if Cms::S3.options[:s3_cname]
+        #  redirect_to("http://#{Cms::S3.options[:s3_cname]}/#{@attachment.file_location}")
+        #else
+        #  redirect_to("http://#{Cms::S3.options[:bucket]}.s3.amazonaws.com/#{@attachment.file_location}")
+        #end
       end
 
       # For S3, this returns the relative path within the bucket.

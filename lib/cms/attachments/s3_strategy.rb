@@ -5,16 +5,17 @@ module Cms
     #   config.cms.attachments.storage = :s3
     class S3Strategy
 
-      logger = ActiveSupport::Logger.new(STDOUT)
       # Redirects users to the file on S3.
       #   Issues:
       #     1. No security, all files are assumed to be public
       #     2. CNAMEs are not supported.
       def self.send_attachment(attachment, controller)
         url = attachment.url
-        url = url.sub "s3.amazonaws.com" Cms::S3.options[:s3_cname] if ! Cms::S3.options[:s3_cname].nil?
+
+        if(not Cms::S3.options[:s3_cname].nil?)
+          url = url.sub "s3.amazonaws.com", Cms::S3.options[:s3_cname]
+        end
         controller.redirect_to url
-        logger.warn(attachment.inspect)
         # Possible s3_cname implementation
         #if Cms::S3.options[:s3_cname]
         #  redirect_to("http://#{Cms::S3.options[:s3_cname]}/#{@attachment.file_location}")
